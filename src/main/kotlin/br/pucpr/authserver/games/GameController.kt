@@ -18,7 +18,7 @@ class GameController (
     @PostMapping
     fun insert(@RequestBody @Valid gameRequest: CreateGameRequest) =
         gameService.insert(gameRequest.toGame(), gameRequest.fkStudioId)
-            .let { ResponseEntity.ok().body(it) }
+            .let { ResponseEntity.status(HttpStatus.CREATED).body(it) }
 
     @GetMapping
     fun list() =
