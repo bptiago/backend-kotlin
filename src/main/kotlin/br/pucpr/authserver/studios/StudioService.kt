@@ -19,4 +19,19 @@ class StudioService (
     }
 
     fun getStudio(id: Long): Studio = repository.findByIdOrNull(id) ?: throw NotFoundException("Não foi encontrado studio com ID $id")
+
+    fun update(id: Long, updatedStudio: Studio): Studio {
+        val existingStudio = getStudio(id)
+        // Update fields of the existing studio with the new data
+        existingStudio.name = updatedStudio.name
+        existingStudio.location = updatedStudio.location
+        existingStudio.creationDate = updatedStudio.creationDate
+        existingStudio.games = updatedStudio.games
+        return repository.save(existingStudio)
+    }
+
+    fun delete(id: Long) {
+        val studio = getStudio(id)
+        repository.delete(studio)
+    }
 }
