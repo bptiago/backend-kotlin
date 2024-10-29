@@ -1,7 +1,9 @@
 package br.pucpr.authserver.games
 
+import br.pucpr.authserver.errors.BadRequestException
 import br.pucpr.authserver.games.requests.CreateGameRequest
 import br.pucpr.authserver.games.requests.UpdateGameRequest
+import br.pucpr.authserver.utils.SortDir
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,8 +20,10 @@ class GameController (
             .let { ResponseEntity.status(HttpStatus.CREATED).body(it) }
 
     @GetMapping
-    fun list() =
-        gameService.list()
+    fun list(@RequestParam(required = false) sortDir: String?) =
+        gameService.list(
+            SortDir.getByName(sortDir) ?: throw BadRequestException("Parâmetro SORT inválido (deve ser ASC ou DESC)")
+        )
             .let { ResponseEntity.ok().body(it) }
 
     @GetMapping("/{id}")

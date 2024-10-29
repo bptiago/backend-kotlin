@@ -1,5 +1,6 @@
 package br.pucpr.authserver.users
 
+import br.pucpr.authserver.utils.SortDir
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest

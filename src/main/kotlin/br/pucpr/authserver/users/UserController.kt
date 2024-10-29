@@ -4,8 +4,8 @@ import br.pucpr.authserver.errors.BadRequestException
 import br.pucpr.authserver.users.requests.CreateUserRequest
 import br.pucpr.authserver.users.requests.LoginRequest
 import br.pucpr.authserver.users.requests.UpdateUserRequest
-import br.pucpr.authserver.users.responses.LoginResponse
 import br.pucpr.authserver.users.responses.UserResponse
+import br.pucpr.authserver.utils.SortDir
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CREATED

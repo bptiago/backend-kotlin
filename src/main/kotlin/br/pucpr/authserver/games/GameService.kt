@@ -5,6 +5,8 @@ import br.pucpr.authserver.errors.NotFoundException
 import br.pucpr.authserver.games.requests.UpdateGameRequest
 
 import br.pucpr.authserver.studios.StudioRepository
+import br.pucpr.authserver.utils.SortDir
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -24,7 +26,12 @@ class GameService (
         return studio.games.last()
     }
 
-    fun list(): List<Game> = repository.findAll()
+    fun list(sortDir: SortDir): List<Game> {
+        return when (sortDir) {
+            SortDir.ASC -> repository.findAll()
+            SortDir.DESC -> repository.findAll(Sort.by("id").reverse())
+        }
+    }
 
     fun getStudio(id: Long): Game =
         repository.findByIdOrNull(id) ?: throw NotFoundException("Não foi encontrado game com ID $id")

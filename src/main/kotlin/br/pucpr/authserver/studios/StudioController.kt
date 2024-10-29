@@ -1,8 +1,10 @@
 package br.pucpr.authserver.studios
 
+import br.pucpr.authserver.errors.BadRequestException
 import br.pucpr.authserver.games.requests.CreateStudioRequest
 import br.pucpr.authserver.studios.requests.UpdateStudioRequest
 import br.pucpr.authserver.studios.responses.CreateStudioResponse
+import br.pucpr.authserver.utils.SortDir
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
@@ -20,8 +22,10 @@ class StudioController (
             .let { ResponseEntity.status(CREATED).body(it) }
 
     @GetMapping
-    fun list() =
-        service.list()
+    fun list(@RequestParam(required = false) sortDir: String?) =
+        service.list(
+            SortDir.getByName(sortDir) ?: throw BadRequestException("Parâmetro SORT inválido (deve ser ASC ou DESC)")
+        )
             .let { ResponseEntity.ok().body(it) }
 
     @GetMapping("/{id}")

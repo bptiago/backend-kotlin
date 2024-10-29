@@ -6,6 +6,7 @@ import br.pucpr.authserver.roles.RoleRepository
 import br.pucpr.authserver.security.Jwt
 import br.pucpr.authserver.users.responses.LoginResponse
 import br.pucpr.authserver.users.responses.UserResponse
+import br.pucpr.authserver.utils.SortDir
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
