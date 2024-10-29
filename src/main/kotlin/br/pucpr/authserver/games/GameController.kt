@@ -4,9 +4,11 @@ import br.pucpr.authserver.errors.BadRequestException
 import br.pucpr.authserver.games.requests.CreateGameRequest
 import br.pucpr.authserver.games.requests.UpdateGameRequest
 import br.pucpr.authserver.utils.SortDir
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -31,12 +33,16 @@ class GameController (
         gameService.getStudio(id)
             .let { ResponseEntity.ok(it) }
 
+    @SecurityRequirement(name = "AuthServer")
     @PatchMapping("/{id}")
+    @PreAuthorize("permitAll()")
     fun update(@PathVariable id: Long, @RequestBody @Valid gameRequest: UpdateGameRequest): ResponseEntity<Game> =
         gameService.update(id, gameRequest)
             .let { ResponseEntity.ok(it) }
 
+    @SecurityRequirement(name = "AuthServer")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     fun delete(@PathVariable id: Long): ResponseEntity<Void> =
         gameService.delete(id)
             .let { ResponseEntity.ok().build() }

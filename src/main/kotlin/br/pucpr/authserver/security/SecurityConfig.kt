@@ -4,26 +4,32 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.Customizer
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector
 
 @Configuration
-@EnableWebSecurity
+@EnableMethodSecurity
 @SecurityScheme(
     name="AuthServer",
     type= SecuritySchemeType.HTTP,
     scheme = "bearer",
     bearerFormat = "JWT"
 )
-class SecurityConfig {
+class SecurityConfig(
+    private val jwtFilter: JwtTokenFilter
+) {
     @Bean
     fun mvc(introspector: HandlerMappingIntrospector) =
         MvcRequestMatcher.Builder(introspector)
@@ -51,6 +57,14 @@ class SecurityConfig {
             .csrf { it.disable() }
             .headers { it.frameOptions { fo -> fo.disable() }}
             .authorizeHttpRequests { requests ->
-                requests.anyRequest().permitAll()
-            }.build()
+                requests
+                    .requestMatchers(antMatcher(HttpMethod.GET)).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/users/login")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/users")).permitAll()
+                    .requestMatchers(mvc.pattern("/games")).permitAll()
+                    .requestMatchers(mvc.pattern("/studios")).permitAll()
+                    .requestMatchers(antMatcher("/h2-console/**")).permitAll()
+                    .anyRequest().authenticated()
+            }.addFilterBefore(jwtFilter, BasicAuthenticationFilter::class.java)
+            .build()
 }

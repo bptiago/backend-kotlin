@@ -1,16 +1,21 @@
 package br.pucpr.authserver.users
 
 import br.pucpr.authserver.errors.BadRequestException
+import br.pucpr.authserver.errors.ForbiddenException
+import br.pucpr.authserver.security.UserToken
 import br.pucpr.authserver.users.requests.CreateUserRequest
 import br.pucpr.authserver.users.requests.LoginRequest
 import br.pucpr.authserver.users.requests.UpdateUserRequest
 import br.pucpr.authserver.users.responses.UserResponse
 import br.pucpr.authserver.utils.SortDir
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -46,20 +51,30 @@ class UserController(
             ?: ResponseEntity.notFound().build()
 
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "AuthServer")
+    @PreAuthorize("hasRole('ADMIN')")
     fun delete(@PathVariable id: Long): ResponseEntity<Void> =
         service.delete(id)
             ?.let { ResponseEntity.ok().build() }
             ?: ResponseEntity.notFound().build()
 
+    @SecurityRequirement(name = "AuthServer")
     @PatchMapping("/{id}")
+    @PreAuthorize("permitAll()")
     fun update(
         @PathVariable id: Long,
-        @RequestBody @Valid updateUserRequest: UpdateUserRequest
-    ): ResponseEntity<UserResponse> =
-        service.update(id, updateUserRequest.name!!)
+        @RequestBody @Valid updateUserRequest: UpdateUserRequest,
+        auth: Authentication
+    ): ResponseEntity<UserResponse> {
+        val token = auth.principal as? UserToken ?: throw ForbiddenException()
+        if (token.id != id && !token.isAdmin) throw ForbiddenException()
+
+        return service.update(id, updateUserRequest.name!!)
             ?.let { UserResponse(it) }
             ?.let { ResponseEntity.ok(it) }
             ?: ResponseEntity.noContent().build()
+
+    }
 
     @PutMapping("/{id}/roles/{role}")
     fun grant(

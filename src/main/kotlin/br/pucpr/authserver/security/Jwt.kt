@@ -2,9 +2,15 @@ package br.pucpr.authserver.security
 
 import br.pucpr.authserver.users.User
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.jackson.io.JacksonDeserializer
 import io.jsonwebtoken.jackson.io.JacksonSerializer
 import io.jsonwebtoken.security.Keys
+import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -27,6 +33,32 @@ class Jwt {
                 .compact()
         }
 
+    fun extract(req: HttpServletRequest): Authentication? {
+        try {
+            val header = req.getHeader(AUTHORIZATION)
+            if (header == null || !header.startsWith("Bearer ")) return null
+            val token = header.removePrefix("Bearer ")
+            val claims = Jwts.parser()
+                .json(JacksonDeserializer(
+                    mapOf(USER_FIELD to UserToken::class.java))
+                )
+                .verifyWith(Keys.hmacShaKeyFor(SECRET.toByteArray()))
+                .build()
+                .parseSignedClaims(token).payload
+            //Aplicamos nossas próprias regras de segurança
+            if (claims.issuer != ISSUER) {
+                log.debug("Token rejected: $ISSUER != ${claims.issuer}")
+                return null
+            }
+            return claims
+                .get(USER_FIELD, UserToken::class.java)
+                .toAuthentication()
+        } catch (e: Throwable) {
+            log.debug("Token rejected", e)
+            return null
+        }
+    }
+
 
     companion object {
         val log = LoggerFactory.getLogger(Jwt::class.java)
@@ -40,5 +72,13 @@ class Jwt {
             ZonedDateTime.now(ZoneOffset.UTC)
         private fun ZonedDateTime.toDate() =
             Date.from(this.toInstant())
+
+        private fun UserToken.toAuthentication(): Authentication {
+            val authorities = this.roles.map {
+                SimpleGrantedAuthority("ROLE_$it") }
+            return UsernamePasswordAuthenticationToken.authenticated(
+                this, id, authorities)
+        }
+
     }
 }
