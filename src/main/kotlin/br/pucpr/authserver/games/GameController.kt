@@ -24,16 +24,16 @@ class GameController (
 
     @GetMapping("/{id}")
     fun findById(@PathVariable id: Long): ResponseEntity<Game> =
-        gameService.findById(id)
+        gameService.getStudio(id)
             .let { ResponseEntity.ok(it) }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     fun update(@PathVariable id: Long, @RequestBody @Valid gameRequest: UpdateGameRequest): ResponseEntity<Game> =
-        gameService.update(id, gameRequest.toGame())
+        gameService.update(id, gameRequest)
             .let { ResponseEntity.ok(it) }
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long): ResponseEntity<Void> =
         gameService.delete(id)
-            .let { ResponseEntity.noContent().build() }
+            .let { ResponseEntity.ok().build() }
 }

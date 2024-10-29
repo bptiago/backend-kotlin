@@ -4,7 +4,6 @@ import br.pucpr.authserver.games.requests.CreateStudioRequest
 import br.pucpr.authserver.studios.requests.UpdateStudioRequest
 import br.pucpr.authserver.studios.responses.CreateStudioResponse
 import jakarta.validation.Valid
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -21,23 +20,22 @@ class StudioController (
             .let { ResponseEntity.status(CREATED).body(it) }
 
     @GetMapping
-    fun getStudio(@RequestParam id:Long) =
-        service.getStudio(id).let {
-            ResponseEntity.ok(it)
-        }
+    fun list() =
+        service.list()
+            .let { ResponseEntity.ok().body(it) }
 
     @GetMapping("/{id}")
     fun findById(@PathVariable id: Long): ResponseEntity<Studio> =
         service.getStudio(id)
             .let { ResponseEntity.ok(it) }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     fun update(@PathVariable id: Long, @RequestBody @Valid studioRequest: UpdateStudioRequest): ResponseEntity<Studio> =
-        service.update(id, studioRequest.toStudio())
+        service.update(id, studioRequest)
             .let { ResponseEntity.ok(it) }
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long): ResponseEntity<Void> =
         service.delete(id)
-            .let { ResponseEntity.noContent().build() }
+            .let { ResponseEntity.ok().build() }
 }

@@ -1,8 +1,7 @@
 package br.pucpr.authserver.studios
 
 import br.pucpr.authserver.errors.NotFoundException
-import br.pucpr.authserver.games.GameRepository
-import jakarta.persistence.EntityNotFoundException
+import br.pucpr.authserver.studios.requests.UpdateStudioRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -20,18 +19,19 @@ class StudioService (
 
     fun getStudio(id: Long): Studio = repository.findByIdOrNull(id) ?: throw NotFoundException("Não foi encontrado studio com ID $id")
 
-    fun update(id: Long, updatedStudio: Studio): Studio {
+    fun list(): List<Studio> = repository.findAll()
+
+    fun update(id: Long, studioRequest: UpdateStudioRequest): Studio {
         val existingStudio = getStudio(id)
-        // Update fields of the existing studio with the new data
-        existingStudio.name = updatedStudio.name
-        existingStudio.location = updatedStudio.location
-        existingStudio.creationDate = updatedStudio.creationDate
-        existingStudio.games = updatedStudio.games
+
+        existingStudio.name = studioRequest.name
+        existingStudio.location = studioRequest.location
+        existingStudio.creationDate = studioRequest.creationDate
         return repository.save(existingStudio)
     }
 
     fun delete(id: Long) {
         val studio = getStudio(id)
-        repository.delete(studio)
+        return repository.delete(studio)
     }
 }

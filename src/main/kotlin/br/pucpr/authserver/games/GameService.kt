@@ -1,9 +1,9 @@
 package br.pucpr.authserver.games
 
 import br.pucpr.authserver.errors.BadRequestException
-import br.pucpr.authserver.errors.EntityNotFoundException
+import br.pucpr.authserver.errors.NotFoundException
+import br.pucpr.authserver.games.requests.UpdateGameRequest
 
-import br.pucpr.authserver.studios.Studio
 import br.pucpr.authserver.studios.StudioRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -26,23 +26,19 @@ class GameService (
 
     fun list(): List<Game> = repository.findAll()
 
-    fun findById(id: Long): Game {
-        return repository.findById(id)
-            .orElseThrow { EntityNotFoundException("Game not found with id: $id") }
-    }
+    fun getStudio(id: Long): Game =
+        repository.findByIdOrNull(id) ?: throw NotFoundException("Não foi encontrado game com ID $id")
 
-    fun update(id: Long, updatedGame: Game): Game {
-        val existingGame = findById(id)
-        // Update the fields of the existing game with the new data
-        existingGame.name = updatedGame.name
-        existingGame.overview = updatedGame.overview
-        existingGame.launchDate = updatedGame.launchDate
-        existingGame.studio = updatedGame.studio
+    fun update(id: Long, gameRequest: UpdateGameRequest): Game {
+        val existingGame = getStudio(id)
+        existingGame.name = gameRequest.name
+        existingGame.overview = gameRequest.overview
+        existingGame.launchDate = gameRequest.launchDate
         return repository.save(existingGame)
     }
 
     fun delete(id: Long) {
-        val game = findById(id)
-        repository.delete(game)
+        val game = getStudio(id)
+        return repository.delete(game)
     }
 }

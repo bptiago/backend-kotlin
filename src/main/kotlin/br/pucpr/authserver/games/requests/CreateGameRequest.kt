@@ -14,8 +14,8 @@ data class CreateGameRequest (
     val overview: String?,
     @field:NotNull
     val launchDate: LocalDate?,
-    @field:NotBlank
-    val studio: String?
+//    @field:NotBlank
+//    val studio: String?
 
 ) {
     fun toGame(): Game = Game(
@@ -23,6 +23,6 @@ data class CreateGameRequest (
         name = name!!,
         overview = overview!!,
         launchDate = launchDate ?: LocalDate.now(),
-        studio = studio!!
+//        studio = studio!!
     )
 }
