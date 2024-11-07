@@ -37,11 +37,11 @@ class UserController(
     ) =
         service.list(
             sortDir = SortDir.getByName(sortDir) ?:
-                throw BadRequestException("Invalid sort dir!"),
+            throw BadRequestException("Invalid sort dir!"),
             role=role
         )
-        .map { UserResponse(it) }
-        .let { ResponseEntity.ok(it) }
+            .map { UserResponse(it) }
+            .let { ResponseEntity.ok(it) }
 
     @GetMapping("/{id}")
     fun findById(@PathVariable id: Long) =
@@ -81,10 +81,10 @@ class UserController(
         @PathVariable id: Long,
         @PathVariable role: String
     ): ResponseEntity<Void> =
-    if (service.addRole(id, role.uppercase()))
-        ResponseEntity.ok().build()
-    else
-        ResponseEntity.status(NO_CONTENT).build()
+        if (service.addRole(id, role.uppercase()))
+            ResponseEntity.ok().build()
+        else
+            ResponseEntity.status(NO_CONTENT).build()
 
     @PostMapping("/login")
     fun login(@Valid @RequestBody login: LoginRequest) =

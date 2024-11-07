@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface UserRepository: JpaRepository<User, Long> {
+    fun findByEmailOrNull(email: String): User?
     fun findByEmail(email: String): User?
 
     @Query(
@@ -15,4 +16,5 @@ interface UserRepository: JpaRepository<User, Long> {
         " order by u.name"
     )
     fun findByRole(role: String): List<User>
+
 }

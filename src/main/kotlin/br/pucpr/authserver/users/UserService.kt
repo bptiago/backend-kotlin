@@ -40,6 +40,9 @@ class UserService(
 
     fun findByIdOrNull(id: Long) = repository.findByIdOrNull(id)
 
+    fun findByEmailOrNull(email: String) = repository.findByEmail(email)
+
+
     fun delete(id: Long): User? {
         val user = repository.findByIdOrNull(id)
             ?: return null
