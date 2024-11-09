@@ -47,8 +47,6 @@ class GameService (
         return repository.save(existingGame)
     }
 
-    // Todo: fazer um endpoint para atualizar o STUDIO do jogo
-
     fun delete(id: Long) {
         val game = getStudio(id)
         log.info("Delete game with ID={}", game.id)

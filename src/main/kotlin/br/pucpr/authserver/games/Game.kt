@@ -21,9 +21,4 @@ class Game (
 
     @NotNull
     var launchDate: LocalDate,
-
-    // O model Studio já gera um campo foreign key aqui
-//    @NotNull
-//    var studio: String,
-
 )
