@@ -3,6 +3,7 @@ package br.pucpr.authserver.studios
 import br.pucpr.authserver.errors.NotFoundException
 import br.pucpr.authserver.studios.requests.UpdateStudioRequest
 import br.pucpr.authserver.utils.SortDir
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -15,7 +16,7 @@ class StudioService (
         if (studio.id != null) {
             throw IllegalArgumentException("Registro com ID ${studio.id} já inserido")
         }
-
+        log.info("Insert studio with name={}, location={}", studio.name, studio.location)
         return repository.save(studio)
     }
 
@@ -30,7 +31,7 @@ class StudioService (
 
     fun update(id: Long, studioRequest: UpdateStudioRequest): Studio {
         val existingStudio = getStudio(id)
-
+        log.info("Update information from studio with ID={}. Update: name={}, location={}, creationDate={}", existingStudio.id, studioRequest.name, existingStudio.location, existingStudio.creationDate)
         existingStudio.name = studioRequest.name
         existingStudio.location = studioRequest.location
         existingStudio.creationDate = studioRequest.creationDate
@@ -39,6 +40,11 @@ class StudioService (
 
     fun delete(id: Long) {
         val studio = getStudio(id)
+        log.info("Delete studio with ID={}", id)
         return repository.delete(studio)
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(StudioService::class.java)
     }
 }
