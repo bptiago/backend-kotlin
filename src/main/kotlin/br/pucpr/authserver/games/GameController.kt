@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*
 class GameController (
     val gameService: GameService
 ) {
+    @SecurityRequirement(name = "AuthServer")
+    @PreAuthorize("permitAll()")
     @PostMapping
     fun insert(@RequestBody @Valid gameRequest: CreateGameRequest) =
         gameService.insert(gameRequest.toGame(), gameRequest.fkStudioId)

@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*
 class StudioController (
     val service: StudioService
 ) {
+    @SecurityRequirement(name = "AuthServer")
+    @PreAuthorize("permitAll()")
     @PostMapping
     fun insert(@RequestBody @Valid studioRequest: CreateStudioRequest) =
         service.insert(studioRequest.toStudio())
