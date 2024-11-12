@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface GameRepository : JpaRepository<Game, Long> {
+    fun findByNameContainingIgnoreCase(name: String): List<Game>
 }

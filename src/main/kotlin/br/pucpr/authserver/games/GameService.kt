@@ -20,7 +20,6 @@ class GameService (
         if (game.id != null) {
             throw IllegalArgumentException("Registro com ID ${game.id} já inserido!")
         }
-        // Não tá aparecendo mensagem de exception
         val studio = studioRepository.findByIdOrNull(studioId) ?: throw BadRequestException("Não há studio cadastrado com ID $studioId")
         studio.games.add(game)
         studioRepository.save(studio)
@@ -34,6 +33,8 @@ class GameService (
             SortDir.DESC -> repository.findAll(Sort.by("id").reverse())
         }
     }
+
+    fun searchWithName(name: String) = repository.findByNameContainingIgnoreCase(name)
 
     fun getStudio(id: Long): Game =
         repository.findByIdOrNull(id) ?: throw NotFoundException("Não foi encontrado game com ID $id")

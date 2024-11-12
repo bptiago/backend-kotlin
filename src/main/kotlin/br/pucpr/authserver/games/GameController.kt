@@ -35,6 +35,11 @@ class GameController (
         gameService.getStudio(id)
             .let { ResponseEntity.ok(it) }
 
+    @GetMapping("/name")
+    fun searchWithName(@RequestParam(required = true) name: String) =
+        gameService.searchWithName(name)
+            .let { ResponseEntity.ok(it) }
+
     @SecurityRequirement(name = "AuthServer")
     @PatchMapping("/{id}")
     @PreAuthorize("permitAll()")
